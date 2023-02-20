@@ -15,7 +15,7 @@ public class OpenAPIConfig {
                 .info(infoAPI());
     }
     public Info infoAPI() {
-        return new Info().title("SpringDoc-Demo")
+        return new Info().title("pi")
                 .description("TP étude de cas")
                 .contact(contactAPI());
     }
