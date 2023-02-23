@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Publication")
+@RequestMapping("/publication")
 public class PublicationController {
     @Autowired
     PublicationInterface PublicationService;
 
     //ajout
-    @PostMapping("/add-Publication")
+    @PostMapping("/add-publication")
     public Publication addPublication(@RequestBody Publication rsv){
         //return PublicationService.addPublication(rsv);
         Publication Publication= PublicationService.addPublication(rsv);
