@@ -32,4 +32,6 @@ public class Commentaire implements Serializable {
     @OneToMany(mappedBy = "commentaire", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
     private Set<Reaction> reactions;
+
+
 }

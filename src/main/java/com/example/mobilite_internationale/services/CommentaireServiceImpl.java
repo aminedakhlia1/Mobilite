@@ -2,6 +2,7 @@ package com.example.mobilite_internationale.services;
 
 
 import com.example.mobilite_internationale.entities.Commentaire;
+import com.example.mobilite_internationale.entities.ReactType;
 import com.example.mobilite_internationale.interfaces.CommentaireInterface;
 import com.example.mobilite_internationale.repositories.CommentaireRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,4 +42,13 @@ public class CommentaireServiceImpl implements CommentaireInterface {
     public void removeCommentaire(Integer idCommentaire) {
         Commentairerepo.deleteById(idCommentaire);
     }
+
+    @Override
+    public List<Commentaire> getCommentaireDesc() {
+     return    Commentairerepo.findAllByOrderByDateCmntDesc();
+    }
+    public List<Commentaire> getCommentaireReactMost(ReactType reactionType) {
+        return    Commentairerepo.findAllByMostReacted(reactionType);
+    }
+
 }

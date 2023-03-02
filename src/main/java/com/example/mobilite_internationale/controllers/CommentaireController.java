@@ -1,6 +1,7 @@
 package com.example.mobilite_internationale.controllers;
 
 import com.example.mobilite_internationale.entities.Commentaire;
+import com.example.mobilite_internationale.entities.ReactType;
 import com.example.mobilite_internationale.interfaces.CommentaireInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,15 @@ public class CommentaireController {
     @DeleteMapping("/remove-Commentaire/{id-Commentaire}")
     public void removeCommentaire(@PathVariable("id-Commentaire") Integer idCommentaire) {
         CommentaireService.removeCommentaire(idCommentaire);
+    }
+
+    @GetMapping("/recents")
+    public List<Commentaire> getCommentairesRecents() {
+        return CommentaireService.getCommentaireDesc();
+    }
+    @GetMapping("/MostReacted")
+    public List<Commentaire> getCommentairesMostReacted(@RequestParam("type") ReactType reactionType) {
+        return CommentaireService.getCommentaireReactMost(reactionType);
     }
 
 }
