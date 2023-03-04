@@ -38,9 +38,15 @@ public class Opportunity implements Serializable {
     @Enumerated(EnumType.STRING)
     private TypeOpportunity typeOpportunity;
 
+    private String formula;
+
     //Associations
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy="opportunity")
     private List<Candidacy> candidacyList;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL)
+    User user;
 }
 

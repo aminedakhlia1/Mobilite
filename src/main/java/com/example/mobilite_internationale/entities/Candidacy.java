@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Getter
@@ -22,8 +24,24 @@ public class Candidacy implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCandidacy;
 
-    private double score;
+    //@NotNull
+    //@DecimalMin("0.0")
+    //@DecimalMax("20.0")
+    private  float average_1year;
 
+    //@NotNull
+    //@DecimalMin("0.0")
+    //@DecimalMax("20.0")
+    private  float average_2year;
+
+    //@NotNull
+    //@DecimalMin("0.0")
+    //@DecimalMax("20.0")
+    private  float average_3year;
+
+    private float score;
+
+    //@NotNull
     @Enumerated(EnumType.STRING)
     private Speciality speciality;
 
@@ -36,6 +54,11 @@ public class Candidacy implements Serializable {
     private Opportunity opportunity;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="candidacy")
-    private List<File> fileList;
+    @OneToOne(mappedBy = "candidacy", cascade = CascadeType.ALL)
+    private File file;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL)
+    User user;
+
 }

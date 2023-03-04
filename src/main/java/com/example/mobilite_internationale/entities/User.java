@@ -1,6 +1,5 @@
 package com.example.mobilite_internationale.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,26 +7,37 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class File implements Serializable {
-
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idFile;
+    private Integer idUser;
 
-    private String nameFile;
+    public  String Firstname;
 
-    private String path;
+    public  String Lastname;
+
+    public  String Email;
+
+    public  String Login;
+
+    public  String Password;
+
+    public  String Photo;
+
+    public  String Universityname;
+
+    public  String Societyname;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     //Associations
-    @JsonIgnore
-    @OneToOne()
-    private Candidacy candidacy;
+
 
 
 }
