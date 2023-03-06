@@ -37,7 +37,7 @@ public class Candidacy implements Serializable {
     //@NotNull
     //@DecimalMin("0.0")
     //@DecimalMax("20.0")
-    private  float average_3year;
+    private float average_3year;
 
     private float score;
 

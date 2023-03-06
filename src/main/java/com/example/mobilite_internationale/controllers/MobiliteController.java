@@ -163,6 +163,16 @@ public class MobiliteController {
 
     }
 
+    @PutMapping("/update-candidacy-status_By_Type_Selection/{id-candidacy}")
+    public void updateCandidacyStatus_TypeSelection(@PathVariable("id-candidacy")Integer idCandidacy){
+        mobiliteInterface.updateCandidacyStatus_TypeSelection(idCandidacy);
+    }
+
+    @PutMapping("/update-candidacy-status_By_Opportunity/{id-opportunity}")
+    public void updateCandidacyStatus_ByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity){
+        mobiliteInterface.updateCandidacyStatus_ByOpportunity(idOpportunity);
+    }
+
     /*-------------- File --------------*/
     @GetMapping("/retrieve-file/{id-file}")
     public File retrieveFile(@PathVariable("id-file") Integer idFile) {

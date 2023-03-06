@@ -38,6 +38,11 @@ public class Opportunity implements Serializable {
     @Enumerated(EnumType.STRING)
     private TypeOpportunity typeOpportunity;
 
+    @Enumerated(EnumType.STRING)
+    private TypeSelection typeSelection;
+
+    private float noteEliminatoire;
+
     private String formula;
 
     //Associations

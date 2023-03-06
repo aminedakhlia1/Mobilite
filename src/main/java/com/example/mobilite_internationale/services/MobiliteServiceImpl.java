@@ -24,7 +24,10 @@ import javax.mail.MessagingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -146,7 +149,7 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         //Save file
         File file = new File();
         file.setNameFile(multipartFile.getOriginalFilename());
-        file.setPath("uploadsFiles/" + file.getNameFile());
+        file.setPath("/uploadsFiles/" + file.getNameFile());
         file.setCandidacy(savedCandidacy);
         File savedFile = fileRepository.save(file);
 
@@ -245,6 +248,79 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         return fileRepository.save(savedFile);
     }
 
+    public List<Candidacy> findCandidaciesByOpportunity(Integer idOpportunity) {
+        return candidacyRepository.findByOpportunityIdOpportunity(idOpportunity);
+    }
+
+    @Override
+    public void updateCandidacyStatus_TypeSelection(Integer idCandidacy) {
+
+        Candidacy candidacy = candidacyRepository.findById(idCandidacy).orElse(null);
+        Opportunity opportunity = candidacy.getOpportunity();
+
+        if (opportunity.getTypeSelection() == TypeSelection.valueOf("ON_FILE")) {
+            if (candidacy.getScore() < opportunity.getNoteEliminatoire()) {
+                candidacy.setStatus(Status.REFUSED);
+            } else {
+                candidacy.setStatus(Status.ACCEPTED);
+            }
+            candidacyRepository.save(candidacy);
+        }
+        else if (opportunity.getTypeSelection() == TypeSelection.valueOf("BY_CAPACITY")) {
+            List<Candidacy> candidacies = candidacyRepository.findByOpportunityOrderByScoreDesc(opportunity);
+            int acceptedCount = 0;
+            for (Candidacy candidacy1 : candidacies) {
+                if (acceptedCount < opportunity.getCapacity()) {
+                    candidacy.setStatus(Status.ACCEPTED);
+                    acceptedCount++;
+                } else {
+                    candidacy.setStatus(Status.REFUSED);
+                }
+                candidacyRepository.save(candidacy1);
+            }
+
+        }
+
+    }
+
+    @Override
+    public void updateCandidacyStatus_ByOpportunity(Integer idOpportunity) {
+        Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
+        if (opportunity == null) {
+            throw new IllegalArgumentException("Opportunity with ID " + idOpportunity + " not found");
+        }
+
+        if (opportunity.getTypeSelection() == TypeSelection.ON_FILE) {
+            List<Candidacy> candidacies = opportunity.getCandidacyList().stream()
+                    .sorted(Comparator.comparing(Candidacy::getScore).reversed())
+                    .collect(Collectors.toList());
+
+            int acceptedCount = 0;
+            for (Candidacy candidacy : candidacies) {
+                if (acceptedCount >= opportunity.getCapacity() || candidacy.getScore() < opportunity.getNoteEliminatoire()) {
+                    candidacy.setStatus(Status.REFUSED);
+                } else {
+                    candidacy.setStatus(Status.ACCEPTED);
+                    acceptedCount++;
+                }
+            }
+        } else if (opportunity.getTypeSelection() == TypeSelection.BY_CAPACITY) {
+            List<Candidacy> candidacies = opportunity.getCandidacyList().stream()
+                    .sorted(Comparator.comparing(Candidacy::getScore).reversed())
+                    .collect(Collectors.toList());
+
+            int acceptedCount = 0;
+            for (Candidacy candidacy : candidacies) {
+                if (acceptedCount >= opportunity.getCapacity()) {
+                    candidacy.setStatus(Status.REFUSED);
+                } else {
+                    candidacy.setStatus(Status.ACCEPTED);
+                    acceptedCount++;
+                }
+            }
+        }
+        opportunityRepository.save(opportunity);
+    }
 
     /*-------------- Mailing --------------*/
     public void sendOpportunityEmailToStudents() throws MessagingException {

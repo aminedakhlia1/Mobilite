@@ -33,6 +33,10 @@ public interface MobiliteInterface {
     public Candidacy updateCandidacyStatus(Integer idCandidacy);
     public Integer countCandidaciesByOpportunity(Integer idOpportunity);
 
+    public void updateCandidacyStatus_TypeSelection(Integer idCandidacy);
+
+    public void updateCandidacyStatus_ByOpportunity(Integer idOpportunity);
+
 
     /*-------------- File --------------*/
     public File retrieveFile (Integer idFile);
