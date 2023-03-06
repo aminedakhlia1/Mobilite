@@ -2,6 +2,7 @@ package com.example.mobilite_internationale.repositories;
 
 import com.example.mobilite_internationale.entities.Candidacy;
 import com.example.mobilite_internationale.entities.Opportunity;
+import com.example.mobilite_internationale.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +18,6 @@ public interface CandidacyRepository extends JpaRepository<Candidacy,Integer> {
 
     List<Candidacy> findByOpportunityIdOpportunity(Integer idOpportunity);
 
-    List<Candidacy> findByOpportunityOrderByScoreDesc(Opportunity opportunity);
+    List<Candidacy> findAllByUser(User user);
+
 }

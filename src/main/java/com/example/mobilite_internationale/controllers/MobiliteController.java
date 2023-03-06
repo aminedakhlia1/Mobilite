@@ -1,5 +1,6 @@
 package com.example.mobilite_internationale.controllers;
 
+import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -169,6 +169,11 @@ public class MobiliteController {
     @PutMapping("/update-candidacy-status_By_Opportunity/{id-opportunity}")
     public void updateCandidacyStatus_ByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity){
         mobiliteInterface.updateCandidacyStatus_ByOpportunity(idOpportunity);
+    }
+
+    @GetMapping("/get-candidacy-history/{id-user}")
+    public List<CandidacyDTO> getCandidacyHistory(@PathVariable("id-user") Integer idUser) {
+        return mobiliteInterface.getCandidacyHistoryForStudent(idUser);
     }
 
     /*-------------- File --------------*/

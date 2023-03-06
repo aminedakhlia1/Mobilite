@@ -1,5 +1,6 @@
 package com.example.mobilite_internationale.interfaces;
 
+import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.entities.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,7 @@ public interface MobiliteInterface {
     public Integer countCandidaciesByOpportunity(Integer idOpportunity);
     public float calculateCandidacyScoreByOpportunity(Integer idOpportunity, Integer idCandidacy);
     public void updateCandidacyStatus_ByOpportunity(Integer idOpportunity);
+    public List<CandidacyDTO> getCandidacyHistoryForStudent(Integer idUser);
 
 
     /*-------------- File --------------*/

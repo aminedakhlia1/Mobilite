@@ -1,5 +1,6 @@
 package com.example.mobilite_internationale.services;
 
+import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.example.mobilite_internationale.repositories.CandidacyRepository;
@@ -24,6 +25,7 @@ import javax.mail.MessagingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -53,8 +55,7 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     @Override
     public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser) {
         User user = userRepository.findById(idUser).get();
-            Role role = user.getRole();
-            if (role == Role.University || role == Role.Society) {
+            if (user.getRole() == Role.University || user.getRole() == Role.Society) {
                 opportunity.setUser(user);
                 return opportunityRepository.save(opportunity);
             } else {
@@ -150,8 +151,7 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         candidacy.setOpportunity(opportunity);
 
         User user = userRepository.findById(idUser).orElse(null);
-        Role role = user.getRole();
-        if (role != Role.Student) {
+        if (user.getRole() != Role.Student) {
             throw new IllegalArgumentException("Only users with the student role can create candidacies.");
         }
             candidacy.setUser(user);
@@ -258,6 +258,32 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         }
         opportunityRepository.save(opportunity);
     }
+
+    @Override
+    public List<CandidacyDTO> getCandidacyHistoryForStudent(Integer idUser) {
+        User user = userRepository.findById(idUser).orElse(null);
+        if (user.getRole() != Role.Student) {
+            throw new IllegalArgumentException("Only users with the student role can create candidacies.");
+        }
+        List<Candidacy> candidacies = candidacyRepository.findAllByUser(user);
+
+        // Map candidacies to DTOs
+        List<CandidacyDTO> candidacyDTOs = new ArrayList<>();
+        for (Candidacy candidacy : candidacies) {
+            CandidacyDTO candidacyDTO = new CandidacyDTO();
+            candidacyDTO.setAverage1Year(candidacy.getAverage_1year());
+            candidacyDTO.setAverage2Year(candidacy.getAverage_2year());
+            candidacyDTO.setAverage3Year(candidacy.getAverage_3year());
+            candidacyDTO.setScore(candidacy.getScore());
+            candidacyDTO.setSpeciality(candidacy.getSpeciality());
+            candidacyDTO.setStatus(candidacy.getStatus());
+            candidacyDTO.setOpportunityName(candidacy.getOpportunity().getNameOpportunity());
+            candidacyDTOs.add(candidacyDTO);
+        }
+
+        return candidacyDTOs;
+    }
+
 
 
     /*-------------- File --------------*/
