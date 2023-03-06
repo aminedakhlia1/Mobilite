@@ -10,6 +10,7 @@ import java.util.List;
 public interface MobiliteInterface {
 
     /*-------------- Opportunity --------------*/
+    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser);
     public Opportunity addOpportunity (Opportunity opportunity);
     public List<Opportunity> retrieveAllOpportunites();
     public Opportunity retrieveOpportunity (Integer idOpportunity);
@@ -23,7 +24,8 @@ public interface MobiliteInterface {
 
     /*-------------- Candidacy --------------*/
     public Candidacy addCandidacy (Candidacy candidacy);
-    public Candidacy addCandidacyWithFileAndAssignToOpportunity(Candidacy candidacy,Integer idOpportunity,MultipartFile multipartFile) throws IOException;
+    public Candidacy addCandidacyWithFileAndAssignToOpportunityAndUser(Candidacy candidacy, Integer idOpportunity,
+                                                                       MultipartFile multipartFile, Integer idUser);
     public List<Candidacy> retrieveAllCandidacies();
     public Candidacy retrieveCandidacy (Integer idCandidacy);
     public Candidacy updateCandidacy (Candidacy candidacy);

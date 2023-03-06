@@ -25,6 +25,13 @@ public class MobiliteController {
     MobiliteInterface mobiliteInterface;
 
     /*-------------- Opportunity --------------*/
+    @PostMapping("addOpportunityAndAssignToUser/{id-user}")
+    public ResponseEntity<Opportunity> addOpportunityAndAssignToUser(@RequestBody Opportunity opportunity,
+                                                                     @PathVariable("id-user") Integer idUser) {
+        Opportunity opportunity1 = mobiliteInterface.addOpportunityAndAssignToUser(opportunity, idUser);
+        return ResponseEntity.ok(opportunity1);
+    }
+
     @PostMapping("/add-opportunity")
     public Opportunity addOpportunity(@RequestBody Opportunity opp) {
         Opportunity opportunity = mobiliteInterface.addOpportunity(opp);
@@ -98,10 +105,11 @@ public class MobiliteController {
         return candidacy;
     }
 
-    @PostMapping(value="/add-candidacy-file-opportunity/{idOpportunity}", consumes = {"multipart/form-data"})
+    @PostMapping(value="/add-candidacy-file-and-assign-to-opportunity-and-user/{idOpportunity}/{idUser}", consumes = {"multipart/form-data"})
     public ResponseEntity<Candidacy> addCandidacyWithFile(@PathVariable("idOpportunity") Integer idOpportunity,
+                                                          @PathVariable("idUser") Integer idUser,
                                                           @RequestParam("candidacy") String candidacyJson,
-                                                          @RequestParam("file") MultipartFile file) throws IOException {
+                                                          @RequestParam("file") MultipartFile file) {
 
         //Convertir JSON string un objet
         ObjectMapper objectMapper = new ObjectMapper();
@@ -112,7 +120,7 @@ public class MobiliteController {
             e.printStackTrace();
         }
 
-        Candidacy savedCandidacy = mobiliteInterface.addCandidacyWithFileAndAssignToOpportunity(candidacy,idOpportunity, file);
+        Candidacy savedCandidacy = mobiliteInterface.addCandidacyWithFileAndAssignToOpportunityAndUser(candidacy,idOpportunity, file, idUser);
         return new ResponseEntity<>(savedCandidacy, HttpStatus.CREATED);
     }
 

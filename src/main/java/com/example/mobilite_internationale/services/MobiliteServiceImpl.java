@@ -51,6 +51,18 @@ public class MobiliteServiceImpl implements MobiliteInterface {
 
     /*-------------- Opportunity --------------*/
     @Override
+    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser) {
+        User user = userRepository.findById(idUser).get();
+            Role role = user.getRole();
+            if (role == Role.University || role == Role.Society) {
+                opportunity.setUser(user);
+                return opportunityRepository.save(opportunity);
+            } else {
+                throw new IllegalArgumentException("User must have UNIVERSITY or SOCIETY role to add opportunities.");
+            }
+        }
+
+    @Override
     public Opportunity addOpportunity(Opportunity opportunity) {
         return opportunityRepository.save(opportunity);
     }
@@ -131,24 +143,32 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     }
 
     @Override
-    public Candidacy addCandidacyWithFileAndAssignToOpportunity(Candidacy candidacy, Integer idOpportunity, MultipartFile multipartFile) throws IOException {
-        //Récupérer opportunity par id
+    public Candidacy addCandidacyWithFileAndAssignToOpportunityAndUser(Candidacy candidacy, Integer idOpportunity,
+                                                                MultipartFile multipartFile, Integer idUser) {
+
         Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
-        //Affecter opportunity à candidature
         candidacy.setOpportunity(opportunity);
-        Candidacy savedCandidacy = candidacyRepository.save(candidacy);
 
-        //Save file
-        File file = new File();
-        file.setNameFile(multipartFile.getOriginalFilename());
-        file.setPath("/uploadsFiles/" + file.getNameFile());
-        file.setCandidacy(savedCandidacy);
-        File savedFile = fileRepository.save(file);
+        User user = userRepository.findById(idUser).orElse(null);
+        Role role = user.getRole();
+        if (role != Role.Student) {
+            throw new IllegalArgumentException("Only users with the student role can create candidacies.");
+        }
+            candidacy.setUser(user);
+            Candidacy savedCandidacy = candidacyRepository.save(candidacy);
 
-        //Affecter candidature à file
-        savedCandidacy.setFile(savedFile);
-        candidacyRepository.save(savedCandidacy);
-        return savedCandidacy;
+            //Save file
+            File file = new File();
+            file.setNameFile(multipartFile.getOriginalFilename());
+            file.setPath("/uploadsFiles/" + file.getNameFile());
+            file.setCandidacy(savedCandidacy);
+            File savedFile = fileRepository.save(file);
+
+            //Affecter candidature à file
+            savedCandidacy.setFile(savedFile);
+            candidacyRepository.save(savedCandidacy);
+            return savedCandidacy;
+
     }
 
     @Override

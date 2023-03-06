@@ -17,27 +17,24 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idUser;
 
-    public  String Firstname;
+    private  String Firstname;
 
-    public  String Lastname;
+    private  String Lastname;
 
-    public  String Email;
+    private  String Email;
 
-    public  String Login;
+    private  String Login;
 
-    public  String Password;
+    private  String Password;
 
-    public  String Photo;
+    private  String Photo;
 
-    public  String Universityname;
+    private  String Universityname;
 
-    public  String Societyname;
+    private  String Societyname;
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    //Associations
-
 
 
 }
