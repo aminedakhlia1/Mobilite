@@ -139,10 +139,16 @@ public class MobiliteController {
         mobiliteInterface.removeCandidacy(idCandidacy);
     }
 
-   @PutMapping("/calculate-score/{id-candidacy}")
-    public ResponseEntity<Void> calculateScore(@PathVariable("id-candidacy") Integer idCandidacy) {
-        mobiliteInterface.calculateScore(idCandidacy);
-        return ResponseEntity.ok().build();
+    @GetMapping("/find-candicacies-by-opportunity/{id-opportunity}")
+    public List<Candidacy> findCandidaciesByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity){
+        List<Candidacy> candidacies = mobiliteInterface.findCandidaciesByOpportunity(idOpportunity);
+        return candidacies;
+    }
+
+
+    @GetMapping("/count-candidacies-by-opportunities/{id-opportunity}")
+    public Integer countCandidaciesByOpportunityId(@PathVariable("id-opportunity") Integer idOpportunity) {
+        return  mobiliteInterface.countCandidaciesByOpportunity(idOpportunity);
     }
 
     @GetMapping("/calculateCandidacyScoreByOpportunity/{id-opportunity}/{id-candidacy}")
@@ -150,22 +156,6 @@ public class MobiliteController {
                                                                       @PathVariable("id-candidacy") Integer idCandidacy) {
         float score = mobiliteInterface.calculateCandidacyScoreByOpportunity(idOpportunity,idCandidacy);
         return ResponseEntity.ok(score);
-    }
-
-    @PutMapping("/update-candidacy-status/{id-candidacy}")
-    public Candidacy updateCandidacyStatus(@PathVariable("id-candidacy") Integer idCandidacy) {
-        return mobiliteInterface.updateCandidacyStatus(idCandidacy);
-    }
-
-    @GetMapping("/count-candidacies-by-opportunities/{id-opportunity}")
-    public Integer countCandidaciesByOpportunityId(@PathVariable("id-opportunity") Integer idOpportunity) {
-        return  mobiliteInterface.countCandidaciesByOpportunity(idOpportunity);
-
-    }
-
-    @PutMapping("/update-candidacy-status_By_Type_Selection/{id-candidacy}")
-    public void updateCandidacyStatus_TypeSelection(@PathVariable("id-candidacy")Integer idCandidacy){
-        mobiliteInterface.updateCandidacyStatus_TypeSelection(idCandidacy);
     }
 
     @PutMapping("/update-candidacy-status_By_Opportunity/{id-opportunity}")

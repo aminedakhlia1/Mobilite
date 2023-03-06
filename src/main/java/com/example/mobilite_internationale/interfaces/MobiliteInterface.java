@@ -28,13 +28,9 @@ public interface MobiliteInterface {
     public Candidacy retrieveCandidacy (Integer idCandidacy);
     public Candidacy updateCandidacy (Candidacy candidacy);
     public void removeCandidacy(Integer idCandidacy);
-    public void calculateScore(Integer idCandidacy);
-    public float calculateCandidacyScoreByOpportunity(Integer idOpportunity, Integer idCandidacy);
-    public Candidacy updateCandidacyStatus(Integer idCandidacy);
+    public List<Candidacy> findCandidaciesByOpportunity(Integer idOpportunity);
     public Integer countCandidaciesByOpportunity(Integer idOpportunity);
-
-    public void updateCandidacyStatus_TypeSelection(Integer idCandidacy);
-
+    public float calculateCandidacyScoreByOpportunity(Integer idOpportunity, Integer idCandidacy);
     public void updateCandidacyStatus_ByOpportunity(Integer idOpportunity);
 
 

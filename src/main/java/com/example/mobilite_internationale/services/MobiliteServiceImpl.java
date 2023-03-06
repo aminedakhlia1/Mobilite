@@ -75,8 +75,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         opportunityRepository.deleteById(idOpportunity);
     }
 
-
-    //Services avancés
     @Override
     public List<Opportunity> searchOpportunityBySpeciality(Speciality speciality) {
         return opportunityRepository.findBySpeciality(speciality);
@@ -91,13 +89,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     public List<Opportunity> getAvailableOpportunities() {
         LocalDate currentDate = LocalDate.now();
         return opportunityRepository.findByEndDateGreaterThanEqual(currentDate);
-        /* List<Opportunity> availableOpportunities = new ArrayList<>();
-        for (Opportunity opportunity : opportunityRepository.findAll()){
-            if(opportunity.getEndDate().isAfter(currentDate) || opportunity.getEndDate().isEqual(currentDate)) {
-                availableOpportunities.add(opportunity);
-            }
-        }
-        return availableOpportunities;*/
     }
 
     @Override
@@ -114,14 +105,15 @@ public class MobiliteServiceImpl implements MobiliteInterface {
 
         // Création du contenu du QR code
         String qrCodeContent =
-                  "\nName Opportunity: " + opportunity.getNameOpportunity()
+                "\nName Opportunity: " + opportunity.getNameOpportunity()
+                + "\nType: " + opportunity.getTypeOpportunity()
                 + "\nDescription: " + opportunity.getDescription()
                 + "\nStart date: " + opportunity.getStartDate()
                 + "\nEnd date: " + opportunity.getEndDate()
                 + "\nSpeciality: " + opportunity.getSpeciality()
-                + "\nCapacity: " + opportunity.getCapacity()
-                + "\nType: " + opportunity.getTypeOpportunity()
-                + "\nFormula: " + opportunity.getFormula();
+                + "\nType Selection: " + opportunity.getTypeSelection()
+                + "\nNote Elimonatoire: " + opportunity.getNoteEliminatoire()
+                + "\nFormula: " +opportunity.getFormula();
 
         // Génération du QR code en utilisant la bibliothèque QRGen
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -180,11 +172,14 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     }
 
     @Override
-    public void calculateScore(Integer idCandidacy) {
-        Candidacy candidacy = candidacyRepository.findById(idCandidacy).orElse(null);
+    public List<Candidacy> findCandidaciesByOpportunity(Integer idOpportunity) {
+        return candidacyRepository.findByOpportunityIdOpportunity(idOpportunity);
+    }
 
-        candidacy.setScore((candidacy.getAverage_1year() + candidacy.getAverage_2year() + candidacy.getAverage_3year()) / 3);
-        candidacyRepository.save(candidacy);
+    @Override
+    public Integer countCandidaciesByOpportunity(Integer idOpportunity) {
+        //return candidacyRepository.countCandidaciesByOpportunity(idOpportunity);
+        return opportunityRepository.findById(idOpportunity).get().getCandidacyList().size();
     }
 
     @Override
@@ -203,84 +198,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
             candidacyRepository.save(candidacy);
         }
         return candidacy.getScore();
-    }
-
-
-
-    @Override
-    public Candidacy updateCandidacyStatus(Integer idCandidacy) {
-        Candidacy candidacy = candidacyRepository.findById(idCandidacy).orElse(null);
-        calculateScore(idCandidacy);
-
-        if (candidacy.getScore() >= 14) {
-            candidacy.setStatus(Status.ACCEPTED);
-        } else if (candidacy.getScore() >= 11) {
-            candidacy.setStatus(Status.INPROGRESS);
-        } else {
-            candidacy.setStatus(Status.REFUSED);
-        }
-        return candidacyRepository.save(candidacy);
-    }
-
-    @Override
-    public Integer countCandidaciesByOpportunity(Integer idOpportunity) {
-        //return candidacyRepository.countCandidaciesByOpportunity(idOpportunity);
-        return opportunityRepository.findById(idOpportunity).get().getCandidacyList().size();
-    }
-
-
-    /*-------------- File --------------*/
-    @Override
-    public File retrieveFile(Integer idFile) {
-        return fileRepository.findById(idFile).orElse(null);
-    }
-
-
-    @Override
-    public File saveFile(MultipartFile multipartFile) throws IOException {
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        File newFile = new File();
-        newFile.setNameFile(fileName);
-        newFile.setPath("/uploads/" + fileName);
-        File savedFile = fileRepository.save(newFile);
-        String uploadDir = "uploads/" + savedFile.getIdFile();
-        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        return fileRepository.save(savedFile);
-    }
-
-    public List<Candidacy> findCandidaciesByOpportunity(Integer idOpportunity) {
-        return candidacyRepository.findByOpportunityIdOpportunity(idOpportunity);
-    }
-
-    @Override
-    public void updateCandidacyStatus_TypeSelection(Integer idCandidacy) {
-
-        Candidacy candidacy = candidacyRepository.findById(idCandidacy).orElse(null);
-        Opportunity opportunity = candidacy.getOpportunity();
-
-        if (opportunity.getTypeSelection() == TypeSelection.valueOf("ON_FILE")) {
-            if (candidacy.getScore() < opportunity.getNoteEliminatoire()) {
-                candidacy.setStatus(Status.REFUSED);
-            } else {
-                candidacy.setStatus(Status.ACCEPTED);
-            }
-            candidacyRepository.save(candidacy);
-        }
-        else if (opportunity.getTypeSelection() == TypeSelection.valueOf("BY_CAPACITY")) {
-            List<Candidacy> candidacies = candidacyRepository.findByOpportunityOrderByScoreDesc(opportunity);
-            int acceptedCount = 0;
-            for (Candidacy candidacy1 : candidacies) {
-                if (acceptedCount < opportunity.getCapacity()) {
-                    candidacy.setStatus(Status.ACCEPTED);
-                    acceptedCount++;
-                } else {
-                    candidacy.setStatus(Status.REFUSED);
-                }
-                candidacyRepository.save(candidacy1);
-            }
-
-        }
-
     }
 
     @Override
@@ -321,6 +238,30 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         }
         opportunityRepository.save(opportunity);
     }
+
+
+    /*-------------- File --------------*/
+    @Override
+    public File retrieveFile(Integer idFile) {
+        return fileRepository.findById(idFile).orElse(null);
+    }
+
+
+    @Override
+    public File saveFile(MultipartFile multipartFile) throws IOException {
+        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        File newFile = new File();
+        newFile.setNameFile(fileName);
+        newFile.setPath("/uploads/" + fileName);
+        File savedFile = fileRepository.save(newFile);
+        String uploadDir = "uploads/" + savedFile.getIdFile();
+        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        return fileRepository.save(savedFile);
+    }
+
+
+
+
 
     /*-------------- Mailing --------------*/
     public void sendOpportunityEmailToStudents() throws MessagingException {
