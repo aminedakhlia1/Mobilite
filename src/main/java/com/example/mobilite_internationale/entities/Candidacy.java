@@ -24,24 +24,24 @@ public class Candidacy implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCandidacy;
 
-    //@NotNull
-    //@DecimalMin("0.0")
-    //@DecimalMax("20.0")
+    @NotNull(message = "Average year 1 is Required!")
+    @DecimalMin(value = "0.0", message = "Min average is 0.0!")
+    @DecimalMax(value = "20.0", message = "Max average is 20.0!")
     private  float average_1year;
 
-    //@NotNull
-    //@DecimalMin("0.0")
-    //@DecimalMax("20.0")
+    @NotNull(message = "Average year 2 is Required!")
+    @DecimalMin(value = "0.0", message = "Min average is 0.0!")
+    @DecimalMax(value = "20.0", message = "Max average is 20.0!")
     private  float average_2year;
 
-    //@NotNull
-    //@DecimalMin("0.0")
-    //@DecimalMax("20.0")
+    @NotNull(message = "Average year 2 is Required!")
+    @DecimalMin(value = "0.0", message = "Min average is 0.0!")
+    @DecimalMax(value = "20.0", message = "Max average is 20.0!")
     private float average_3year;
 
     private float score;
 
-    //@NotNull
+    @NotNull(message = "Speciality is Required!")
     @Enumerated(EnumType.STRING)
     private Speciality speciality;
 

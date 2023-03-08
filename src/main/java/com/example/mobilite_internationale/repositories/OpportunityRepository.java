@@ -16,4 +16,7 @@ public interface OpportunityRepository extends JpaRepository<Opportunity,Integer
     List<Opportunity> findByEndDateGreaterThanEqual(LocalDate currentDate);
     //List<Opportunity> findAllByStartDateDesc();
     @Query("SELECT o FROM Opportunity o ORDER BY o.startDate DESC") List<Opportunity> findAllByStartDateDesc();
+    //Stat
+    @Query("SELECT o.speciality, COUNT(o) FROM Opportunity o GROUP BY o.speciality ORDER BY COUNT(o) DESC")
+    List<Object[]> findSpecialityCounts();
 }

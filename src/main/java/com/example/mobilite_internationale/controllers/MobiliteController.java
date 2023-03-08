@@ -1,6 +1,7 @@
 package com.example.mobilite_internationale.controllers;
 
 import com.example.mobilite_internationale.dto.CandidacyDTO;
+import com.example.mobilite_internationale.dto.SpecialityDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,12 +27,18 @@ public class MobiliteController {
     MobiliteInterface mobiliteInterface;
 
     /*-------------- Opportunity --------------*/
-    @PostMapping("addOpportunityAndAssignToUser/{id-user}")
+
+    @PostMapping("affect-opportunity-to-user/{id-opportunity}/{id-user}")
+    public void AffectOpportunityToUser(@PathVariable("id-opportunity") Integer idOpportunity,
+                                        @PathVariable("id-user") Integer idUser){
+        mobiliteInterface.AffectOpportunityToUser(idOpportunity,idUser);
+    }
+    /*@PostMapping("addOpportunityAndAssignToUser/{id-user}")
     public ResponseEntity<Opportunity> addOpportunityAndAssignToUser(@RequestBody Opportunity opportunity,
                                                                      @PathVariable("id-user") Integer idUser) {
         Opportunity opportunity1 = mobiliteInterface.addOpportunityAndAssignToUser(opportunity, idUser);
         return ResponseEntity.ok(opportunity1);
-    }
+    }*/
 
     @PostMapping("/add-opportunity")
     public Opportunity addOpportunity(@RequestBody Opportunity opp) {
@@ -98,6 +106,11 @@ public class MobiliteController {
         }
     }
 
+    @GetMapping("/stat-get-popular-specialities")
+    public List<SpecialityDTO> getSpecialityCounts() {
+        return mobiliteInterface.getPopularSpecialties();
+    }
+
     /*-------------- Candidacy --------------*/
     @PostMapping("/add-candidacy")
     public Candidacy addCandidacy(@RequestBody Candidacy c, BindingResult result) {
@@ -108,8 +121,9 @@ public class MobiliteController {
     @PostMapping(value="/add-candidacy-file-and-assign-to-opportunity-and-user/{idOpportunity}/{idUser}", consumes = {"multipart/form-data"})
     public ResponseEntity<Candidacy> addCandidacyWithFile(@PathVariable("idOpportunity") Integer idOpportunity,
                                                           @PathVariable("idUser") Integer idUser,
-                                                          @RequestParam("candidacy") String candidacyJson,
-                                                          @RequestParam("file") MultipartFile file) {
+                                                          @Valid @RequestParam("candidacy") String candidacyJson,
+                                                          @RequestParam("file") MultipartFile file
+                                                          ) {
 
         //Convertir JSON string un objet
         ObjectMapper objectMapper = new ObjectMapper();
@@ -119,6 +133,8 @@ public class MobiliteController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
         Candidacy savedCandidacy = mobiliteInterface.addCandidacyWithFileAndAssignToOpportunityAndUser(candidacy,idOpportunity, file, idUser);
         return new ResponseEntity<>(savedCandidacy, HttpStatus.CREATED);

@@ -1,6 +1,8 @@
 package com.example.mobilite_internationale.services;
 
 import com.example.mobilite_internationale.dto.CandidacyDTO;
+import com.example.mobilite_internationale.dto.SpecialityDTO;
+import com.example.mobilite_internationale.dto.UserDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.example.mobilite_internationale.repositories.CandidacyRepository;
@@ -12,6 +14,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.mysql.cj.jdbc.Blob;
 import lombok.extern.slf4j.Slf4j;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -24,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,21 +57,26 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     private JavaMailSender mailSender;
 
     /*-------------- Opportunity --------------*/
+
     @Override
-    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser) {
-        User user = userRepository.findById(idUser).get();
-            if (user.getRole() == Role.University || user.getRole() == Role.Society) {
-                opportunity.setUser(user);
-                return opportunityRepository.save(opportunity);
-            } else {
-                throw new IllegalArgumentException("User must have UNIVERSITY or SOCIETY role to add opportunities.");
-            }
+    public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser){
+        Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
+        User user = userRepository.findById(idUser).orElse(null);
+        if (user != null && (user.getRole() == Role.Society || user.getRole() == Role.University)) {
+        opportunity.getUsersList().add(user);
+        opportunityRepository.save(opportunity);
         }
+        else throw new IllegalArgumentException("Only users with the university or society role can create opportunities.");
+
+    }
+
+
 
     @Override
     public Opportunity addOpportunity(Opportunity opportunity) {
-        return opportunityRepository.save(opportunity);
+            return opportunityRepository.save(opportunity);
     }
+
 
     @Override
     public List<Opportunity> retrieveAllOpportunites() {
@@ -136,6 +146,15 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         return baos.toByteArray();
     }
 
+    //Stat
+    @Override
+    public List<SpecialityDTO> getPopularSpecialties() {
+        List<Object[]> resultList = opportunityRepository.findSpecialityCounts();
+
+        return resultList.stream()
+                .map(result -> new SpecialityDTO(result[0].toString(), ((Long) result[1]).intValue()))
+                .collect(Collectors.toList());
+    }
 
     /*-------------- Candidacy --------------*/
     @Override
@@ -304,10 +323,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         return fileRepository.save(savedFile);
     }
-
-
-
-
 
     /*-------------- Mailing --------------*/
     public void sendOpportunityEmailToStudents() throws MessagingException {

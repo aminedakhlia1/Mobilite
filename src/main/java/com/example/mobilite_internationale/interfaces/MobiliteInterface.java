@@ -1,6 +1,7 @@
 package com.example.mobilite_internationale.interfaces;
 
 import com.example.mobilite_internationale.dto.CandidacyDTO;
+import com.example.mobilite_internationale.dto.SpecialityDTO;
 import com.example.mobilite_internationale.entities.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public interface MobiliteInterface {
 
     /*-------------- Opportunity --------------*/
-    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser);
+    public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser);
     public Opportunity addOpportunity (Opportunity opportunity);
     public List<Opportunity> retrieveAllOpportunites();
     public Opportunity retrieveOpportunity (Integer idOpportunity);
@@ -22,7 +23,7 @@ public interface MobiliteInterface {
     public List<Opportunity> getAvailableOpportunities();
     public List<Opportunity> sortOpportunitiesByStartDateDesc();
     public byte[] generateQRCodeForOpportunity(Integer idOpportunity) throws Exception;
-
+    public List<SpecialityDTO> getPopularSpecialties();
     /*-------------- Candidacy --------------*/
     public Candidacy addCandidacy (Candidacy candidacy);
     public Candidacy addCandidacyWithFileAndAssignToOpportunityAndUser(Candidacy candidacy, Integer idOpportunity,

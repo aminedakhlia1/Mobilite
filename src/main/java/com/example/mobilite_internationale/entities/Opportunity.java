@@ -51,7 +51,7 @@ public class Opportunity implements Serializable {
     private List<Candidacy> candidacyList;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL)
-    User user;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<User> usersList;
 }
 
