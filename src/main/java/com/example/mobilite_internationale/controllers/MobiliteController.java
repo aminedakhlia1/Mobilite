@@ -30,17 +30,17 @@ public class MobiliteController {
 
     /*-------------- Opportunity --------------*/
 
-    @PostMapping("affect-opportunity-to-user/{id-opportunity}/{id-user}")
+    /*@PostMapping("affect-opportunity-to-user/{id-opportunity}/{id-user}")
     public void AffectOpportunityToUser(@PathVariable("id-opportunity") Integer idOpportunity,
                                         @PathVariable("id-user") Integer idUser) {
         mobiliteInterface.AffectOpportunityToUser(idOpportunity, idUser);
-    }
-    /*@PostMapping("addOpportunityAndAssignToUser/{id-user}")
+    }*/
+    @PostMapping("addOpportunityAndAssignToUser/{id-user}")
     public ResponseEntity<Opportunity> addOpportunityAndAssignToUser(@RequestBody Opportunity opportunity,
                                                                      @PathVariable("id-user") Integer idUser) {
         Opportunity opportunity1 = mobiliteInterface.addOpportunityAndAssignToUser(opportunity, idUser);
         return ResponseEntity.ok(opportunity1);
-    }*/
+    }
 
     @PostMapping("/add-opportunity")
     public Opportunity addOpportunity(@RequestBody Opportunity opp) {

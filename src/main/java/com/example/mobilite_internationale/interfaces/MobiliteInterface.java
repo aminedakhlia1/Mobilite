@@ -14,7 +14,8 @@ import java.util.List;
 public interface MobiliteInterface {
 
     /*-------------- Opportunity --------------*/
-    public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser);
+    //public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser);
+    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser);
     public Opportunity addOpportunity (Opportunity opportunity);
     public List<Opportunity> retrieveAllOpportunites();
     public Opportunity retrieveOpportunity (Integer idOpportunity);

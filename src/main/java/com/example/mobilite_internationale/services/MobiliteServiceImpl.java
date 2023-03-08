@@ -65,15 +65,15 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     /*-------------- Opportunity --------------*/
 
     @Override
-    public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser){
-        Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
-        User user = userRepository.findById(idUser).orElse(null);
-        if (user != null && (user.getRole() == Role.Society || user.getRole() == Role.University)) {
-        opportunity.getUsersList().add(user);
-        opportunityRepository.save(opportunity);
+    public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser) {
+        User user = userRepository.findById(idUser).get();
+        Role role = user.getRole();
+        if (role == Role.University || role == Role.Society) {
+            opportunity.setUser(user);
+            return opportunityRepository.save(opportunity);
+        } else {
+            throw new IllegalArgumentException("User must have UNIVERSITY or SOCIETY role to add opportunities.");
         }
-        else throw new IllegalArgumentException("Only users with the university or society role can create opportunities.");
-
     }
 
 
