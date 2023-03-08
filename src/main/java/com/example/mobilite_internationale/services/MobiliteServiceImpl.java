@@ -366,8 +366,24 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         }
     }
 
+    @Override
+    public void sendEmailsToCandidacy(Integer idOpportunity) {
+        Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
+        List<Candidacy> candidacies = findCandidaciesByOpportunity(idOpportunity);
+
+        for (Candidacy candidacy : candidacies) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(candidacy.getUser().getEmail());
+            message.setSubject("Status of your candidacy in the opportunity " +opportunity.getNameOpportunity());
+
+            message.setText("Hello " + candidacy.getUser().getFirstname() +" "+ candidacy.getUser().getLastname() +
+                    ",\n\n" + "Your candidacy is " + candidacy.getStatus() + " in " + opportunity.getNameOpportunity() +"."
+                    + "\n\nMobiliTech.");;
+            mailSender.send(message);
+        }
 
 
+    }
 }
 
 

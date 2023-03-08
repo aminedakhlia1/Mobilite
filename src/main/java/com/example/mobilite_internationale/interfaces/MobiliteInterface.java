@@ -54,5 +54,5 @@ public interface MobiliteInterface {
     //public void generatePdfForOpportunity(Integer idOpportunity) throws FileNotFoundException, DocumentException;
     //public void sendEmailsForNewOpportunities(Integer idOpportunity) throws MessagingException, FileNotFoundException, DocumentException;
 
-
+    public void sendEmailsToCandidacy(Integer idOpportunity);
 }

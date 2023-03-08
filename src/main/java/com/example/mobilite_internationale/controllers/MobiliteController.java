@@ -222,6 +222,10 @@ public class MobiliteController {
         mobiliteInterface.sendEmailsForNewOpportunities(idOpportunity);
     }
 
+    @PostMapping("/send-email-to-candidacies/{id-opportunity}")
+    public void sendEmailsToCandidacy(@PathVariable("id-opportunity") Integer idOpportunity){
+        mobiliteInterface.sendEmailsToCandidacy(idOpportunity);
+    }
 }
 
 
