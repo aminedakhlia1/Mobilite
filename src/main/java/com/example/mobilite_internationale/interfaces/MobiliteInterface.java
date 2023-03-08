@@ -3,9 +3,11 @@ package com.example.mobilite_internationale.interfaces;
 import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.dto.SpecialityDTO;
 import com.example.mobilite_internationale.entities.*;
+import com.itextpdf.text.DocumentException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,6 +48,10 @@ public interface MobiliteInterface {
 
     /*-------------- Mailing --------------*/
     public void sendOpportunityEmailToStudents() throws MessagingException;
+    public void sendEmailsForNewOpportunities(Integer idOpportunity);
+
+    //public void generatePdfForOpportunity(Integer idOpportunity) throws FileNotFoundException, DocumentException;
+    //public void sendEmailsForNewOpportunities(Integer idOpportunity) throws MessagingException, FileNotFoundException, DocumentException;
 
 
 }

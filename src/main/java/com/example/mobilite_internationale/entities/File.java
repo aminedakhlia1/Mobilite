@@ -29,5 +29,7 @@ public class File implements Serializable {
     @OneToOne()
     private Candidacy candidacy;
 
-
+    public File(String nameFile) {
+        this.nameFile = nameFile;
+    }
 }

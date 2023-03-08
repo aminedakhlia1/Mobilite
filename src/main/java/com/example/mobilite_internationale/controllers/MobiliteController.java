@@ -5,6 +5,7 @@ import com.example.mobilite_internationale.dto.SpecialityDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,8 +32,8 @@ public class MobiliteController {
 
     @PostMapping("affect-opportunity-to-user/{id-opportunity}/{id-user}")
     public void AffectOpportunityToUser(@PathVariable("id-opportunity") Integer idOpportunity,
-                                        @PathVariable("id-user") Integer idUser){
-        mobiliteInterface.AffectOpportunityToUser(idOpportunity,idUser);
+                                        @PathVariable("id-user") Integer idUser) {
+        mobiliteInterface.AffectOpportunityToUser(idOpportunity, idUser);
     }
     /*@PostMapping("addOpportunityAndAssignToUser/{id-user}")
     public ResponseEntity<Opportunity> addOpportunityAndAssignToUser(@RequestBody Opportunity opportunity,
@@ -83,13 +85,13 @@ public class MobiliteController {
     }
 
     @GetMapping("get-available-opportunities")
-    public ResponseEntity<List<Opportunity>> getAvailableOpportunities(){
+    public ResponseEntity<List<Opportunity>> getAvailableOpportunities() {
         List<Opportunity> availableOpportunities = mobiliteInterface.getAvailableOpportunities();
         return ResponseEntity.ok().body(availableOpportunities);
     }
 
     @GetMapping("sort-opportunities-by-startDate-Desc")
-    public ResponseEntity<List<Opportunity>> sortOpportunitiesByStartDateDesc(){
+    public ResponseEntity<List<Opportunity>> sortOpportunitiesByStartDateDesc() {
         List<Opportunity> opportunities = mobiliteInterface.sortOpportunitiesByStartDateDesc();
         return ResponseEntity.ok().body(opportunities);
     }
@@ -118,12 +120,12 @@ public class MobiliteController {
         return candidacy;
     }
 
-    @PostMapping(value="/add-candidacy-file-and-assign-to-opportunity-and-user/{idOpportunity}/{idUser}", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/add-candidacy-file-and-assign-to-opportunity-and-user/{idOpportunity}/{idUser}", consumes = {"multipart/form-data"})
     public ResponseEntity<Candidacy> addCandidacyWithFile(@PathVariable("idOpportunity") Integer idOpportunity,
                                                           @PathVariable("idUser") Integer idUser,
                                                           @Valid @RequestParam("candidacy") String candidacyJson,
                                                           @RequestParam("file") MultipartFile file
-                                                          ) {
+    ) {
 
         //Convertir JSON string un objet
         ObjectMapper objectMapper = new ObjectMapper();
@@ -135,8 +137,7 @@ public class MobiliteController {
         }
 
 
-
-        Candidacy savedCandidacy = mobiliteInterface.addCandidacyWithFileAndAssignToOpportunityAndUser(candidacy,idOpportunity, file, idUser);
+        Candidacy savedCandidacy = mobiliteInterface.addCandidacyWithFileAndAssignToOpportunityAndUser(candidacy, idOpportunity, file, idUser);
         return new ResponseEntity<>(savedCandidacy, HttpStatus.CREATED);
     }
 
@@ -164,7 +165,7 @@ public class MobiliteController {
     }
 
     @GetMapping("/find-candicacies-by-opportunity/{id-opportunity}")
-    public List<Candidacy> findCandidaciesByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity){
+    public List<Candidacy> findCandidaciesByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity) {
         List<Candidacy> candidacies = mobiliteInterface.findCandidaciesByOpportunity(idOpportunity);
         return candidacies;
     }
@@ -172,18 +173,18 @@ public class MobiliteController {
 
     @GetMapping("/count-candidacies-by-opportunities/{id-opportunity}")
     public Integer countCandidaciesByOpportunityId(@PathVariable("id-opportunity") Integer idOpportunity) {
-        return  mobiliteInterface.countCandidaciesByOpportunity(idOpportunity);
+        return mobiliteInterface.countCandidaciesByOpportunity(idOpportunity);
     }
 
     @GetMapping("/calculateCandidacyScoreByOpportunity/{id-opportunity}/{id-candidacy}")
     public ResponseEntity<Float> calculateCandidacyScoreByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity,
                                                                       @PathVariable("id-candidacy") Integer idCandidacy) {
-        float score = mobiliteInterface.calculateCandidacyScoreByOpportunity(idOpportunity,idCandidacy);
+        float score = mobiliteInterface.calculateCandidacyScoreByOpportunity(idOpportunity, idCandidacy);
         return ResponseEntity.ok(score);
     }
 
     @PutMapping("/update-candidacy-status_By_Opportunity/{id-opportunity}")
-    public void updateCandidacyStatus_ByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity){
+    public void updateCandidacyStatus_ByOpportunity(@PathVariable("id-opportunity") Integer idOpportunity) {
         mobiliteInterface.updateCandidacyStatus_ByOpportunity(idOpportunity);
     }
 
@@ -215,4 +216,12 @@ public class MobiliteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'envoi des e-mails : " + e.getMessage());
         }
     }
+
+    @PostMapping("/send-email-for-new-opportunity/{id-opportunity}")
+    public void sendEmailsForNewOpportunities(@PathVariable("id-opportunity") Integer idOpportunity) {
+        mobiliteInterface.sendEmailsForNewOpportunities(idOpportunity);
+    }
+
 }
+
+

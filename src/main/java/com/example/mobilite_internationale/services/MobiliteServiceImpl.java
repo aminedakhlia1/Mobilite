@@ -4,6 +4,7 @@ import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.dto.SpecialityDTO;
 import com.example.mobilite_internationale.dto.UserDTO;
 import com.example.mobilite_internationale.entities.*;
+import com.example.mobilite_internationale.entities.File;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
 import com.example.mobilite_internationale.repositories.CandidacyRepository;
 import com.example.mobilite_internationale.repositories.FileRepository;
@@ -14,20 +15,25 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.mysql.cj.jdbc.Blob;
 import lombok.extern.slf4j.Slf4j;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.mail.internet.MimeMessage;
+import java.io.*;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -341,6 +347,27 @@ public class MobiliteServiceImpl implements MobiliteInterface {
 
         }
     }
+
+    @Override
+    public void sendEmailsForNewOpportunities(Integer idOpportunity) {
+        Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
+        List<User> students = userRepository.findByRole(Role.Student);
+        for (User student : students) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(student.getEmail());
+            message.setSubject("New Opportunity is Available !");
+            message.setText("Dear Students \n\n"
+                    + "A new opportunity called \"" + opportunity.getNameOpportunity() + "\" is now available.\n\n "
+                    + "for more information on this opportunity please see the pdf file below.\n\n"
+                    + "here is the link to submit your candidacy. \n\n"
+                    + "Best regards,\n"
+                    + "MobiliTech");
+            mailSender.send(message);
+        }
+    }
+
+
+
 }
 
 
