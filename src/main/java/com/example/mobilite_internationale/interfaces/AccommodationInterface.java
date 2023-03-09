@@ -11,4 +11,6 @@ public interface AccommodationInterface {
     public Accommodation retrieveAccommodation (Integer  idAccommodation);
     public Accommodation updateAccommodation (Integer id,Accommodation accommodation);
     public void removeAccommodation(Integer idAccommodation);
+
+    public List<Accommodation> AccommodationReccomondation(Accommodation a);
 }

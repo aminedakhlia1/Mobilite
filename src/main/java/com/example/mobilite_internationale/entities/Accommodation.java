@@ -20,9 +20,10 @@ public class Accommodation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idAccommodation;
     private String NameAccommodation;
-    private Integer Capacity;
-    private Boolean TypeAccommodation;
+    private String Capacity;
+    private String TypeAccommodation;
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name = "idReservation", referencedColumnName = "idReservation")
 private  Reservation reservation;
 }
