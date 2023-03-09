@@ -1,12 +1,19 @@
 package com.example.mobilite_internationale.controllers;
 
 import com.example.mobilite_internationale.entities.Commentaire;
+import com.example.mobilite_internationale.entities.Publication;
 import com.example.mobilite_internationale.entities.ReactType;
+import com.example.mobilite_internationale.entities.User;
 import com.example.mobilite_internationale.interfaces.CommentaireInterface;
+import com.example.mobilite_internationale.repositories.UserRepository;
+import com.example.mobilite_internationale.services.PublicationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -16,11 +23,26 @@ public class CommentaireController {
     CommentaireInterface CommentaireService;
 
     //ajout
-    @PostMapping("/add-Commentaire")
-    public Commentaire addCommentaire(@RequestBody Commentaire rsv){
+    @Autowired
+    UserRepository userrepo;
+    @Autowired
+    PublicationServiceImpl pubService;
+    //ajout
+    @PostMapping("/add-Commentaire/{id-user}/{id-pub}")
+    public ResponseEntity<String> addCommentaire(@RequestBody Commentaire cmnt, @PathVariable("id-user") Long idUser,
+                                                 @PathVariable("id-pub") Integer idpub){
         //return CommentaireService.addCommentaire(rsv);
-        Commentaire Commentaire= CommentaireService.addCommentaire(rsv);
-        return  Commentaire;
+        User u=userrepo.findById(idUser).orElse(null);
+        Publication pub=pubService.retrievePublication(idpub);
+        if (pub.getBloquercmnt())
+            return ResponseEntity.badRequest()
+                    .body("Comments are disabled by author !");
+        cmnt.setUser(u);
+        cmnt.setPublication(pub);
+        cmnt.setDateCmnt(LocalDateTime.now());
+        CommentaireService.addCommentaire(cmnt);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Comment added successfully !");
     }
 
     @GetMapping("/retrieve-all-Commentaire")

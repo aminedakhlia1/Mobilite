@@ -27,4 +27,12 @@ public class Publication implements Serializable {
     @OneToMany(mappedBy = "publication", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
     private Set<Commentaire> commentaires;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
+
+    private Boolean Bloquercmnt;
+
+    @OneToOne(mappedBy = "Publication")
+    private  Favoris favoris;
 }

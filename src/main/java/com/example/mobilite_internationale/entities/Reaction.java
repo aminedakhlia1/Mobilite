@@ -23,4 +23,7 @@ public class Reaction implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idComment")
     private Commentaire commentaire;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
 }

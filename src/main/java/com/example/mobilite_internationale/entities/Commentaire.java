@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -22,8 +23,7 @@ public class Commentaire implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idComment;
     private  String contenu;
-    @Temporal(TemporalType.DATE)
-    private Date dateCmnt;
+    private LocalDateTime dateCmnt;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idPub")
@@ -32,6 +32,9 @@ public class Commentaire implements Serializable {
     @OneToMany(mappedBy = "commentaire", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)
     private Set<Reaction> reactions;
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
 
 
 }
