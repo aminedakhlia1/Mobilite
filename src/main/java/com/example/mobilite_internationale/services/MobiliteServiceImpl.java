@@ -2,7 +2,6 @@ package com.example.mobilite_internationale.services;
 
 import com.example.mobilite_internationale.dto.CandidacyDTO;
 import com.example.mobilite_internationale.dto.SpecialityDTO;
-import com.example.mobilite_internationale.dto.UserDTO;
 import com.example.mobilite_internationale.entities.*;
 import com.example.mobilite_internationale.entities.File;
 import com.example.mobilite_internationale.interfaces.MobiliteInterface;
@@ -10,34 +9,27 @@ import com.example.mobilite_internationale.repositories.CandidacyRepository;
 import com.example.mobilite_internationale.repositories.FileRepository;
 import com.example.mobilite_internationale.repositories.OpportunityRepository;
 import com.example.mobilite_internationale.repositories.UserRepository;
-import com.example.mobilite_internationale.utils.FileUploadUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.mysql.cj.jdbc.Blob;
 import lombok.extern.slf4j.Slf4j;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 import java.io.*;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,14 +68,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         }
     }
 
-
-
-    @Override
-    public Opportunity addOpportunity(Opportunity opportunity) {
-            return opportunityRepository.save(opportunity);
-    }
-
-
     @Override
     public List<Opportunity> retrieveAllOpportunites() {
         return opportunityRepository.findAll();
@@ -95,8 +79,15 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     }
 
     @Override
-    public Opportunity updateOpportunity(Opportunity opportunity) {
-        return opportunityRepository.save(opportunity);
+    public Opportunity updateOpportunity(Opportunity opportunity, Integer idUser) {
+        User user = userRepository.findById(idUser).orElse(null);
+        Role role = user.getRole();
+        if (role == Role.University || role == Role.Society) {
+            opportunity.setUser(user);
+            return opportunityRepository.save(opportunity);
+        } else {
+            throw new IllegalArgumentException("User must have UNIVERSITY or SOCIETY role to add opportunities.");
+        }
     }
 
     @Override
@@ -163,11 +154,6 @@ public class MobiliteServiceImpl implements MobiliteInterface {
     }
 
     /*-------------- Candidacy --------------*/
-    @Override
-    public Candidacy addCandidacy(Candidacy candidacy) {
-        return candidacyRepository.save(candidacy);
-    }
-
     @Override
     public Candidacy addCandidacyWithFileAndAssignToOpportunityAndUser(Candidacy candidacy, Integer idOpportunity,
                                                                 MultipartFile multipartFile, Integer idUser) {
@@ -309,81 +295,61 @@ public class MobiliteServiceImpl implements MobiliteInterface {
         return candidacyDTOs;
     }
 
-
-
-    /*-------------- File --------------*/
-    @Override
-    public File retrieveFile(Integer idFile) {
-        return fileRepository.findById(idFile).orElse(null);
-    }
-
-
-    @Override
-    public File saveFile(MultipartFile multipartFile) throws IOException {
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        File newFile = new File();
-        newFile.setNameFile(fileName);
-        newFile.setPath("/uploads/" + fileName);
-        File savedFile = fileRepository.save(newFile);
-        String uploadDir = "uploads/" + savedFile.getIdFile();
-        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        return fileRepository.save(savedFile);
-    }
-
     /*-------------- Mailing --------------*/
-    public void sendOpportunityEmailToStudents() throws MessagingException {
-
-        Role studentRole = Role.Student;
-        List<User> studentUsers = userRepository.findByRole(studentRole);
-
-        for (User user : studentUsers) {
-
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(user.getEmail());
-            message.setSubject("Opportunité de mobilité internationale");
-            message.setText("Cher(e) Etudiants ,\n\nNous avons le plaisir de vous informer que de nouvelles opportunités de mobilité internationale sont maintenant disponibles sur notre site.\n\nConnectez-vous dès maintenant pour découvrir les opportunités et postuler en ligne !\n\nCordialement,\nL'équipe de mobilité internationale.");
-
-            mailSender.send(message);
-
-        }
-    }
-
     @Override
-    public void sendEmailsForNewOpportunities(Integer idOpportunity) {
+    public void sendEmailsForNewOpportunities(Integer idOpportunity) throws MessagingException, IOException {
         Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
         List<User> students = userRepository.findByRole(Role.Student);
         for (User student : students) {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(student.getEmail());
-            message.setSubject("New Opportunity is Available !");
-            message.setText("Dear Students \n\n"
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(student.getEmail());
+            helper.setSubject("New Opportunity is Available !");
+            String text = "Dear Students \n\n"
                     + "A new opportunity called \"" + opportunity.getNameOpportunity() + "\" is now available.\n\n "
-                    + "for more information on this opportunity please see the pdf file below.\n\n"
-                    + "here is the link to submit your candidacy. \n\n"
+                    + "for more information on this opportunity please visit our web site to apply your candidacy.\n\n"
                     + "Best regards,\n"
-                    + "MobiliTech");
+                    + "MobiliTech."
+                    + "<img src='cid:Logo' alt='Logo' style='display: block; margin: auto; width: 200px; float: left; margin-right: 20px;'>";
+
+            helper.setText(text, true);
+            ClassPathResource imageResource = new ClassPathResource("Logo.png");
+            InputStream inputStream = imageResource.getInputStream();
+            DataSource imageDataSource = new ByteArrayDataSource(inputStream, "Logo/png");
+            helper.addInline("Logo", imageDataSource);
             mailSender.send(message);
         }
     }
 
-    @Override
-    public void sendEmailsToCandidacy(Integer idOpportunity) {
+    public void sendEmailsToCandidacy(Integer idOpportunity) throws MessagingException, IOException {
         Opportunity opportunity = opportunityRepository.findById(idOpportunity).orElse(null);
         List<Candidacy> candidacies = findCandidaciesByOpportunity(idOpportunity);
 
         for (Candidacy candidacy : candidacies) {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(candidacy.getUser().getEmail());
-            message.setSubject("Status of your candidacy in the opportunity " +opportunity.getNameOpportunity());
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(candidacy.getUser().getEmail());
+            helper.setSubject("Status of your candidacy in the opportunity " +opportunity.getNameOpportunity());
 
-            message.setText("Hello " + candidacy.getUser().getFirstname() +" "+ candidacy.getUser().getLastname() +
-                    ",\n\n" + "Your candidacy is " + candidacy.getStatus() + " in " + opportunity.getNameOpportunity() +"."
-                    + "\n\nMobiliTech.");;
+            String text = "<p>Hello " + candidacy.getUser().getFirstname() +" "+ candidacy.getUser().getLastname() + ",</p>"
+                    + "<p>Your candidacy is " + candidacy.getStatus() + " in " + opportunity.getNameOpportunity() +".</p>"
+                    + "<br><br>"
+                    + "Best regards,\n"
+                    + "<p>MobiliTech.</p>"
+                    + "<img src='cid:Logo' alt='Logo' style='display: block; margin: auto; width: 200px; float: left; margin-right: 20px;'>";
+
+            helper.setText(text, true);
+            ClassPathResource imageResource = new ClassPathResource("Logo.png");
+            InputStream inputStream = imageResource.getInputStream();
+            DataSource imageDataSource = new ByteArrayDataSource(inputStream, "Logo/png");
+            helper.addInline("Logo", imageDataSource);
+
             mailSender.send(message);
         }
-
-
     }
+
+
+
 }
 
 

@@ -16,10 +16,9 @@ public interface MobiliteInterface {
     /*-------------- Opportunity --------------*/
     //public void AffectOpportunityToUser(Integer idOpportunity, Integer idUser);
     public Opportunity addOpportunityAndAssignToUser(Opportunity opportunity, Integer idUser);
-    public Opportunity addOpportunity (Opportunity opportunity);
     public List<Opportunity> retrieveAllOpportunites();
     public Opportunity retrieveOpportunity (Integer idOpportunity);
-    public Opportunity updateOpportunity (Opportunity opportunity);
+    public Opportunity updateOpportunity (Opportunity opportunity, Integer idUser);
     public void removeOpportunity(Integer idOpportunity);
     public List<Opportunity> searchOpportunityBySpeciality(Speciality speciality);
     public List<Opportunity> searchOpportunityByType(TypeOpportunity typeOpportunity);
@@ -28,7 +27,6 @@ public interface MobiliteInterface {
     public byte[] generateQRCodeForOpportunity(Integer idOpportunity) throws Exception;
     public List<SpecialityDTO> getPopularSpecialties();
     /*-------------- Candidacy --------------*/
-    public Candidacy addCandidacy (Candidacy candidacy);
     public Candidacy addCandidacyWithFileAndAssignToOpportunityAndUser(Candidacy candidacy, Integer idOpportunity,
                                                                        MultipartFile multipartFile, Integer idUser);
     public List<Candidacy> retrieveAllCandidacies();
@@ -41,18 +39,7 @@ public interface MobiliteInterface {
     public void updateCandidacyStatus_ByOpportunity(Integer idOpportunity);
     public List<CandidacyDTO> getCandidacyHistoryForStudent(Integer idUser);
 
-
-    /*-------------- File --------------*/
-    public File retrieveFile (Integer idFile);
-    //public void saveFile(MultipartFile multipartFile) throws IOException;
-    public File saveFile(MultipartFile multipartFile) throws IOException;
-
     /*-------------- Mailing --------------*/
-    public void sendOpportunityEmailToStudents() throws MessagingException;
-    public void sendEmailsForNewOpportunities(Integer idOpportunity);
-
-    //public void generatePdfForOpportunity(Integer idOpportunity) throws FileNotFoundException, DocumentException;
-    //public void sendEmailsForNewOpportunities(Integer idOpportunity) throws MessagingException, FileNotFoundException, DocumentException;
-
-    public void sendEmailsToCandidacy(Integer idOpportunity);
+    public void sendEmailsForNewOpportunities(Integer idOpportunity) throws MessagingException, IOException;
+    public void sendEmailsToCandidacy(Integer idOpportunity) throws MessagingException, IOException;
 }
