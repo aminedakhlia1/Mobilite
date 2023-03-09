@@ -1,6 +1,7 @@
 package tn.esprit.pidev.mobilitechdraft.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.mobilitechdraft.entities.Event;
 import tn.esprit.pidev.mobilitechdraft.entities.User;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/events")
@@ -30,8 +32,9 @@ public class EventController {
 
 
     @PostMapping("/create-event")
-    public Event createEvent(@RequestBody Event event) throws MessagingException, IOException, GeneralSecurityException {
-        return eventService.createEvent(event);
+    public ResponseEntity<String> createEvent(@Valid @RequestBody Event event) throws MessagingException, IOException, GeneralSecurityException {
+        eventService.createEvent(event);
+        return ResponseEntity.ok("event created successfully");
     }
 
 

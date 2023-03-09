@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>tn.esprit.pidev</groupId>
-    <artifactId>MobiliTech_Back</artifactId>
+    <artifactId>MobiliTechDraft</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MobiliTech_Back</name>
-    <description>MobiliTech_Back</description>
+    <name>MobiliTechDraft</name>
+    <description>MobiliTechDraft</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>

@@ -23,7 +23,7 @@ public class Formation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long formationId;
 
-    @NotBlank(message = "champ sujet non fourni")
+    @NotBlank(message = "formationSubjet: Required field")
     private String formationSubjet;
 
     private Date formationDate;
@@ -32,12 +32,12 @@ public class Formation implements Serializable {
 
     private LocalTime formationEndTime;
 
-    @NotBlank(message = "champ formateur non fourni")
+    @NotBlank(message = "formationFormer: Required fields")
     private String formationFormer;
 
     private boolean formationCertified;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "formation")
     private List<ReservationFormation> reservationFormations;
 }

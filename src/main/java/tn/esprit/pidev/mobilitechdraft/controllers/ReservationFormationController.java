@@ -2,12 +2,14 @@ package tn.esprit.pidev.mobilitechdraft.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.mobilitechdraft.entities.Formation;
 import tn.esprit.pidev.mobilitechdraft.entities.ReservationFormation;
 import tn.esprit.pidev.mobilitechdraft.entities.ReservationFormationStatus;
 import tn.esprit.pidev.mobilitechdraft.services.ReservationFormationService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,9 +22,10 @@ public class ReservationFormationController {
 
 
     @RequestMapping(value = "/create-reservation-formation", method = RequestMethod.POST)
-    public ReservationFormation createReservationFormation(@RequestBody ReservationFormation reservationFormation) {
+    public ResponseEntity<String> createReservationFormation(@Valid @RequestBody ReservationFormation reservationFormation) {
 
-        return reservationFormationService.createReservationFormation(reservationFormation);
+        reservationFormationService.createReservationFormation(reservationFormation);
+        return ResponseEntity.ok("your reservation is being processed");
     }
 
 

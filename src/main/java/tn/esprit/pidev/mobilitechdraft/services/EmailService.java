@@ -22,7 +22,7 @@ public class EmailService {
         this.templateEngine = templateEngine;
     }
 
-    public void sendEmail(Event event, User user) throws MessagingException {
+    public void sendEmail(Event event, User user,String x) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -32,6 +32,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariable("event", event);
         context.setVariable("user", user);
+        context.setVariable("x", x);
         System.out.println(event.getEventType());
         String html = templateEngine.process("mail_template", context);
 

@@ -23,10 +23,10 @@ public class Event implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long eventId;
 
-    @NotBlank(message = "champ title non fourni")
+    @NotBlank(message = "eventTitle: Required field")
     private String eventTitle;
 
-    @NotBlank(message = "champ description non fourni")
+    @NotBlank(message = "eventDescription: Required fields")
     private String eventDescription;
 
     @Temporal(TemporalType.DATE)

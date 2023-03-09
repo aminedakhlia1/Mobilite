@@ -1,11 +1,13 @@
 package tn.esprit.pidev.mobilitechdraft.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.mobilitechdraft.entities.Event;
 import tn.esprit.pidev.mobilitechdraft.entities.Formation;
 import tn.esprit.pidev.mobilitechdraft.services.FormationService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +20,10 @@ public class FormationController {
 
 
     @RequestMapping(value = "/create-formation", method = RequestMethod.POST)
-    public Formation createFormation(@RequestBody Formation formation) {
+    public ResponseEntity<String> createFormation(@Valid @RequestBody Formation formation) {
 
-        return formationService.createFormation(formation);
+        formationService.createFormation(formation);
+        return ResponseEntity.ok("formation created successfully");
     }
 
 

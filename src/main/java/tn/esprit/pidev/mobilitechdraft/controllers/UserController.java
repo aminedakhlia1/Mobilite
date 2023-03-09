@@ -1,10 +1,12 @@
 package tn.esprit.pidev.mobilitechdraft.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.pidev.mobilitechdraft.entities.User;
 import tn.esprit.pidev.mobilitechdraft.services.UserServiceImplementation;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +18,9 @@ public class UserController {
 
 
     @PostMapping("/create")
-    public User createUser(@RequestBody User user) {
-        return userServiceImplementation.createUser(user);
+    public ResponseEntity<String> createUser(@Valid @RequestBody User user) {
+        userServiceImplementation.createUser(user);
+        return ResponseEntity.ok("Utilisateur crée avec succès!");
     }
 
     @GetMapping("/getAll")

@@ -2,6 +2,7 @@ package tn.esprit.pidev.mobilitechdraft.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,13 +21,14 @@ public class ReservationFormation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationFormationId;
 
+    @Enumerated(EnumType.STRING)
     private ReservationFormationStatus reservationFormationStatus;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private User user;
 
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("reservationFormations")
+    @ManyToOne
     private Formation formation;
 
 }

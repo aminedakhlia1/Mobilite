@@ -68,11 +68,12 @@ public class EventServiceImplementation implements EventService {
             Optional<User> user1 = userService.getUserById(user.getIdUser());
             userList.add(user1.get());
         }
-        String link = this.newEvent(userList,event);
-        event.setEventLinkHangout(link);
+        List<String> ls = this.newEvent(userList,event);
+        event.setEventLinkHangout(ls.get(0));
         for (User e : userList) {
-            emailService.sendEmail(event, e);
+            emailService.sendEmail(event, e,ls.get(1));
         }
+
         return eventRepository.save(event);
     }
 
@@ -121,7 +122,8 @@ public class EventServiceImplementation implements EventService {
     }
 
 
-    public String newEvent(List<User> attendeeEmails, Event event) throws IOException, GeneralSecurityException {
+    public List<String> newEvent(List<User> attendeeEmails, Event event) throws IOException, GeneralSecurityException {
+
         NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         Credential credential = getCredentials(httpTransport);
@@ -141,13 +143,13 @@ public class EventServiceImplementation implements EventService {
         DateTime startDateTime = new DateTime(String.valueOf(event.getEventStartTime()));
         EventDateTime start = new EventDateTime()
                 .setDateTime(startDateTime)
-                .setTimeZone("Europe/Paris");
+                .setTimeZone("UTC+1");
         event2.setStart(start);
 
         DateTime endDateTime = new DateTime(String.valueOf(event.getEventEndTime()));
         EventDateTime end = new EventDateTime()
                 .setDateTime(endDateTime)
-                .setTimeZone("Europe/Paris");
+                .setTimeZone("UTC+1");
         event2.setEnd(end);
 
         for(User userAttendee:attendeeEmails){
@@ -168,18 +170,21 @@ public class EventServiceImplementation implements EventService {
         c.setMinutes(10);
 
         event2.setConferenceData(conferenceData);
-        service.events().insert("primary", event2).execute();
         com.google.api.services.calendar.model.Event createdEvent = service.events().insert("primary", event2).setConferenceDataVersion(1).setSendNotifications(true).execute();
 
         // Print the Google Meet link
         String meetLink = createdEvent.getHangoutLink();
+        String htmlLink = createdEvent.getHtmlLink();
 
         System.out.printf("Google Meet link: %s\n", meetLink);
         System.out.println(createdEvent);
 
+        List<String> ls = new ArrayList<>();
+        ls.add(meetLink);
+        ls.add(htmlLink);
         // handle the exception
         System.out.println("TEST");
-        return meetLink;
+        return ls;
     }
 
 
