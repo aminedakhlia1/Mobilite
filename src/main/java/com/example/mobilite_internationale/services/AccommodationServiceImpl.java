@@ -46,4 +46,9 @@ public class AccommodationServiceImpl implements AccommodationInterface {
     public void removeAccommodation(Integer idAccommodation) {
     accomodationRepo.deleteById(idAccommodation);
     }
+
+    @Override
+    public List<Accommodation> AccommodationReccomondation(Accommodation a) {
+        return  accomodationRepo.AccomodationReccomondation(a.getCapacity(),a.getTypeAccommodation());
+    }
 }
